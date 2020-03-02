@@ -1,5 +1,6 @@
 import it.marplex.cloudflarebypass.CloudflareHTTPClient
 import kotlinx.coroutines.runBlocking
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -17,8 +18,8 @@ class CloudflareBypassTest {
     fun shouldReturnRealWebpage() = runBlocking {
         val response = client.get("https://www.seriehd.moda")
         val body = response.body!!.string()
+        val bodyPart = body.substring(260, 281)
 
-        val check = body.indexOf("Serie TV Streaming HD") > 0
-        assertTrue(check)
+        assertEquals("Serie TV Streaming HD", bodyPart)
     }
 }
