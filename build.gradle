@@ -1,0 +1,28 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.3.41'
+}
+
+group 'cloudflare-bypass'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3'
+
+    implementation "com.squareup.okhttp3:okhttp:4.4.0"
+    implementation "ru.gildor.coroutines:kotlin-coroutines-okhttp:1.0"
+
+    compile group: 'org.mozilla', name: 'rhino', version: '1.7.12'
+    testImplementation('junit:junit:4.13')
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
