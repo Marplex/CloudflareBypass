@@ -1,19 +1,30 @@
-# Cloudflare Bypass
+<h1 align="center">Cloudflare Bypass</h1><br>
+<p align="center"> 
+🌠A coroutine based kotlin library which bypasses the Cloudflare IUAM page.<br>
+Inspired by <a href="https://github.com/KyranRana/cloudflare-bypass">KyranRana/cloudflare-bypass</a>
+</p>
+<br>
 
-[![CircleCI](https://circleci.com/gh/Marplex/CloudflareBypass.svg)](https://circleci.com/gh/Marplex/CloudflareBypass)
+<p align="center">
+  <a href="https://circleci.com/gh/Marplex/CloudflareBypass"><img alt="CircleCI" src="https://circleci.com/gh/Marplex/CloudflareBypass.svg"/></a>
+  <a href="https://opensource.org/licenses/Apache-2.0"><img alt="License" src="https://img.shields.io/badge/License-Apache%202.0-blue.svg"/></a>
+  <a href="https://github.com/Marplex"><img alt="License" src="https://img.shields.io/static/v1?label=GitHub&message=marplex&color=005cb2"/></a> 
+</p>
 
-A coroutine based kotlin library which bypasses the Cloudflare IUAM page.
+## Features
 
-This library is inspired by [KyranRana/cloudflare-bypass](https://github.com/KyranRana/cloudflare-bypass)
-#### Dependencies
+- [x] HTTP `GET`/`POST`
+- [x] Bypasses regular anti-bot page 
+
+## Dependencies
 
 - OkHttp 4
 - Mozilla Rhino
 
-#### Installation
+## Installation
 ...
 
-#### Usage
+## Usage
 
 Requesting a cloudflare-protected webpage.
 
@@ -58,7 +69,16 @@ Create a custom HTTP client
 
 ```kotlin
 val client = CloudflareHTTPClient() {
-    //cookieJar(...)
-    //connectionSpecs(...)
+    delay = 8000
+    httpClient = {
+        //cookieJar(...)
+        //connectionSpecs(...)
+    }
 }
 ```
+
+## Todo
+
+- [ ] Implement every HTTP methods
+- [ ] Make this library more portable (Android)
+- [ ] Try to bypass captcha
