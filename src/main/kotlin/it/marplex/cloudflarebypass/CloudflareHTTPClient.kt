@@ -18,6 +18,7 @@ package it.marplex.cloudflarebypass
 
 import it.marplex.cloudflarebypass.exceptions.UnsupportedChallengeException
 import it.marplex.cloudflarebypass.models.uam.UAMPageAtributes
+import it.marplex.cloudflarebypass.models.uam.UAMSettings
 import it.marplex.cloudflarebypass.util.VolatileCookieJar
 import okhttp3.*
 import okhttp3.HttpUrl.Companion.toHttpUrl
@@ -44,13 +45,19 @@ import java.util.*
  * }
  * </code>
  */
-class CloudflareHTTPClient(block: (OkHttpClient.Builder.() -> Unit)? = null) {
+class CloudflareHTTPClient(uamSettingsBlock: (UAMSettings.() -> Unit)? = null) {
 
     /**
      * Http client used by the bypasser.
      * It can be customized using the class constructor block
      */
     private var client: OkHttpClient
+
+    /**
+     * Contains custom user settings
+     * Es: delay, http client blocks
+     */
+    private var uamSettings: UAMSettings
 
     /**
      * List of supported chipers.
@@ -65,12 +72,15 @@ class CloudflareHTTPClient(block: (OkHttpClient.Builder.() -> Unit)? = null) {
         .build()
 
     init {
+        uamSettings = UAMSettings().apply {
+            uamSettingsBlock?.invoke(this)
+        }
 
         //Setup http client
         client = OkHttpClient.Builder()
             .cookieJar(VolatileCookieJar())
             .connectionSpecs(Collections.singletonList(spec))
-            .apply { block?.invoke(this) }
+            .apply { uamSettings.httpClient?.invoke(this) }
             .build()
     }
 
@@ -156,7 +166,7 @@ class CloudflareHTTPClient(block: (OkHttpClient.Builder.() -> Unit)? = null) {
         val scheme = response.request.url.scheme
         val host = response.request.url.host
 
-        kotlinx.coroutines.delay(4000)
+        kotlinx.coroutines.delay(uamSettings.delay)
 
         //By accessing "formParams" the JS is automatically resolved and the challenge completed
         val attributes = UAMPageAtributes(scheme, host, page)
