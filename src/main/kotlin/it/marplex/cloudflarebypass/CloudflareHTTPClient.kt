@@ -102,8 +102,9 @@ class CloudflareHTTPClient(block: (OkHttpClient.Builder.() -> Unit)? = null) {
             .build()
 
         val response =  client.newCall(request).await()
-        val page = response.body!!.string()
+        if(response.code == 200) return response
 
+        val page = response.body!!.string()
         return when {
             isIUAMChallenge(response, page) -> solveCFChallenge(response, page)
             isCaptchaChallenge(response, page) -> throw UnsupportedChallengeException()

@@ -15,8 +15,10 @@ class CloudflareBypassTest {
 
     @Test
     fun shouldReturnRealWebpage() = runBlocking {
-        val response = client.get("https://altadefinizione-nuovo.link")
-        val check = response.code == 200
+        val response = client.get("https://www.seriehd.moda")
+        val body = response.body!!.string()
+
+        val check = body.indexOf("Serie TV Streaming HD") > 0
         assertTrue(check)
     }
 }
