@@ -1,5 +1,7 @@
 # Cloudflare Bypass
 
+[![CircleCI](https://circleci.com/gh/Marplex/CloudflareBypass.svg)](https://circleci.com/gh/Marplex/CloudflareBypass)
+
 A coroutine based kotlin library which bypasses the Cloudflare IUAM page.
 
 This library is inspired by [KyranRana/cloudflare-bypass](https://github.com/KyranRana/cloudflare-bypass)
