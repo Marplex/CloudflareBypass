@@ -1,6 +1,6 @@
 <h1 align="center">Cloudflare Bypass</h1><br>
-<p align="center"> 
-🌠A coroutine based kotlin library which bypasses the Cloudflare IUAM page.<br>
+<p align="center">
+💠️A coroutine based kotlin library which bypasses the Cloudflare IUAM page.<br>
 Inspired by <a href="https://github.com/KyranRana/cloudflare-bypass">KyranRana/cloudflare-bypass</a>
 </p>
 <br>
