@@ -22,7 +22,18 @@ Inspired by <a href="https://github.com/KyranRana/cloudflare-bypass">KyranRana/c
 - Mozilla Rhino
 
 ## Installation
-...
+Add jcenter repository
+```gradle
+repositories {
+    jcenter()
+}
+```
+
+And add a dependency code
+
+```gradle
+implementation 'it.marplex.cloudflarebypass:cloudflare-bypass:1.0'
+```
 
 ## Usage
 
