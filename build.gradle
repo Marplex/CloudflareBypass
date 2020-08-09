@@ -46,7 +46,7 @@ jar {
     exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'META-INF/*.MF'
 
     manifest {
-        attributes 'Main-Class': 'it.marplex.cloudflarebypass.MainKt'
+        attributes 'Main-Class': 'io.marplex.cloudflarebypass.MainKt'
     }
 
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
