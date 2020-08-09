@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package it.marplex.cloudflarebypass.models.uam
+package io.marplex.cloudflarebypass.models.uam
 
-import it.marplex.cloudflarebypass.util.JavascriptEvaluator
+import io.marplex.cloudflarebypass.util.JavascriptEvaluator
 import org.mozilla.javascript.Context;
 
 /**

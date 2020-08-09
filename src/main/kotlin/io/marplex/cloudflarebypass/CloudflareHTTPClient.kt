@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package it.marplex.cloudflarebypass
+package io.marplex.cloudflarebypass
 
-import it.marplex.cloudflarebypass.exceptions.UnsupportedChallengeException
-import it.marplex.cloudflarebypass.models.uam.UAMPageAtributes
-import it.marplex.cloudflarebypass.models.uam.UAMSettings
-import it.marplex.cloudflarebypass.util.VolatileCookieJar
+import io.marplex.cloudflarebypass.exceptions.UnsupportedChallengeException
+import io.marplex.cloudflarebypass.models.uam.UAMPageAtributes
+import io.marplex.cloudflarebypass.models.uam.UAMSettings
+import io.marplex.cloudflarebypass.util.VolatileCookieJar
 import okhttp3.*
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import ru.gildor.coroutines.okhttp.await

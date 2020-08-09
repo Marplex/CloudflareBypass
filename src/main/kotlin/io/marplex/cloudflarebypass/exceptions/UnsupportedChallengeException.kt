@@ -1,4 +1,4 @@
-package it.marplex.cloudflarebypass.exceptions
+package io.marplex.cloudflarebypass.exceptions
 
 import java.lang.Exception
 

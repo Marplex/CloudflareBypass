@@ -1,4 +1,4 @@
-package it.marplex.cloudflarebypass.util
+package io.marplex.cloudflarebypass.util
 
 import org.mozilla.javascript.Context
 import org.mozilla.javascript.Scriptable

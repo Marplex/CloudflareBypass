@@ -1,4 +1,4 @@
-package it.marplex.cloudflarebypass.models.uam
+package io.marplex.cloudflarebypass.models.uam
 
 /**
  * Holds the necessary information used to parse and solve the challenge
