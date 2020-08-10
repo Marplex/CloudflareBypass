@@ -32,7 +32,7 @@ repositories {
 And add a dependency code
 
 ```gradle
-implementation 'it.marplex.cloudflarebypass:cloudflare-bypass:1.0'
+implementation 'me.marplex.cloudflarebypass:cloudflare-bypass:1.1'
 ```
 
 ## Usage

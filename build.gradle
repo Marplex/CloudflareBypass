@@ -1,8 +1,9 @@
 group 'cloudflare-bypass'
-version '1.0-SNAPSHOT'
+version '1.1'
+
 
 buildscript {
-    ext.kotlin_version = '1.3.41'
+    ext.kotlin_version = '1.3.72'
     ext.dokka_version = '0.10.1'
 
     repositories {
@@ -13,6 +14,7 @@ buildscript {
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "org.jetbrains.dokka:dokka-gradle-plugin:$dokka_version"
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.5'
     }
 }
 
@@ -45,7 +47,7 @@ jar {
     exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'META-INF/*.MF'
 
     manifest {
-        attributes 'Main-Class': 'it.marplex.cloudflarebypass.MainKt'
+        attributes 'Main-Class': 'me.marplex.cloudflarebypass.MainKt'
     }
 
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
@@ -57,4 +59,8 @@ compileKotlin {
 
 compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
+}
+
+if (file("./deploy.gradle").exists()) {
+    apply from: 'deploy.gradle'
 }
