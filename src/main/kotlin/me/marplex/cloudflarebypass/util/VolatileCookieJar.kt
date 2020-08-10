@@ -1,4 +1,4 @@
-package it.marplex.cloudflarebypass.util
+package me.marplex.cloudflarebypass.util
 
 import okhttp3.Cookie
 import okhttp3.CookieJar

@@ -1,4 +1,4 @@
-package it.marplex.cloudflarebypass.models.uam
+package me.marplex.cloudflarebypass.models.uam
 
 import okhttp3.OkHttpClient
 

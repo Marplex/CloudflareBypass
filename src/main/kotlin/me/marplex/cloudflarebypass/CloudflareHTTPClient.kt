@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package it.marplex.cloudflarebypass
+package me.marplex.cloudflarebypass
 
-import it.marplex.cloudflarebypass.exceptions.UnsupportedChallengeException
-import it.marplex.cloudflarebypass.models.uam.UAMPageAtributes
-import it.marplex.cloudflarebypass.models.uam.UAMSettings
-import it.marplex.cloudflarebypass.util.VolatileCookieJar
+import me.marplex.cloudflarebypass.exceptions.UnsupportedChallengeException
+import me.marplex.cloudflarebypass.models.uam.UAMPageAtributes
+import me.marplex.cloudflarebypass.models.uam.UAMSettings
+import me.marplex.cloudflarebypass.util.DefaultJavascriptEvaluator
+import me.marplex.cloudflarebypass.util.JavascriptEvaluator
+import me.marplex.cloudflarebypass.util.VolatileCookieJar
 import okhttp3.*
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import ru.gildor.coroutines.okhttp.await
 import okhttp3.FormBody
-import okhttp3.Cookie
 import okhttp3.HttpUrl
-import okhttp3.CookieJar
 import okhttp3.CipherSuite
 import okhttp3.TlsVersion
 import okhttp3.ConnectionSpec
@@ -45,13 +45,18 @@ import java.util.*
  * }
  * </code>
  */
-class CloudflareHTTPClient(uamSettingsBlock: (UAMSettings.() -> Unit)? = null) {
+@Suppress("BlockingMethodInNonBlockingContext")
+open class CloudflareHTTPClient(uamSettingsBlock: (UAMSettings.() -> Unit)? = null) {
+
+    init {
+        JavascriptEvaluator.set(DefaultJavascriptEvaluator())
+    }
 
     /**
      * Http client used by the bypasser.
      * It can be customized using the class constructor block
      */
-    private var client: OkHttpClient
+    var okHttpClient: OkHttpClient
 
     /**
      * Contains custom user settings
@@ -76,10 +81,12 @@ class CloudflareHTTPClient(uamSettingsBlock: (UAMSettings.() -> Unit)? = null) {
             uamSettingsBlock?.invoke(this)
         }
 
+        val specs = listOf(spec, ConnectionSpec.CLEARTEXT)
+
         //Setup http client
-        client = OkHttpClient.Builder()
+        okHttpClient = OkHttpClient.Builder()
             .cookieJar(VolatileCookieJar())
-            .connectionSpecs(Collections.singletonList(spec))
+            .connectionSpecs(specs)
             .apply { uamSettings.httpClient?.invoke(this) }
             .build()
     }
@@ -103,7 +110,7 @@ class CloudflareHTTPClient(uamSettingsBlock: (UAMSettings.() -> Unit)? = null) {
      *
      * @return OkHttp response with bypassed content
      */
-    suspend fun get(url: String, block: (Request.Builder.() -> Unit)? = null): Response {
+    suspend fun get(url: HttpUrl, block: (Request.Builder.() -> Unit)? = null): Response {
         val request = Request.Builder()
             .url(url)
             .headers(headers)
@@ -111,8 +118,8 @@ class CloudflareHTTPClient(uamSettingsBlock: (UAMSettings.() -> Unit)? = null) {
             .get()
             .build()
 
-        val response =  client.newCall(request).await()
-        if(response.code == 200) return response
+        val response =  okHttpClient.newCall(request).await()
+        if(response.code == 200 || response.code == 404 || response.code == 403) return response
 
         val page = response.body!!.string()
         return when {
@@ -132,7 +139,7 @@ class CloudflareHTTPClient(uamSettingsBlock: (UAMSettings.() -> Unit)? = null) {
      *
      * @return OkHttp response with bypassed content
      */
-    suspend fun post(url: String, data: FormBody, block: (Request.Builder.() -> Unit)? = null): Response {
+    suspend fun post(url: HttpUrl, data: FormBody, block: (Request.Builder.() -> Unit)? = null): Response {
         val request = Request.Builder()
             .url(url)
             .headers(headers)
@@ -140,7 +147,9 @@ class CloudflareHTTPClient(uamSettingsBlock: (UAMSettings.() -> Unit)? = null) {
             .post(data)
             .build()
 
-        val response =  client.newCall(request).await()
+        val response =  okHttpClient.newCall(request).await()
+        if(response.code == 200 || response.code == 404 || response.code == 403) return response
+
         val page = response.body!!.string()
 
         return when {
@@ -162,7 +171,7 @@ class CloudflareHTTPClient(uamSettingsBlock: (UAMSettings.() -> Unit)? = null) {
      * @return OkHttp response with bypassed content
      */
     private suspend fun solveCFChallenge(response: Response, page: String): Response {
-        val urlTemplate = "%s://%s/"
+        val urlTemplate = "%s://%s"
         val scheme = response.request.url.scheme
         val host = response.request.url.host
 
@@ -173,9 +182,9 @@ class CloudflareHTTPClient(uamSettingsBlock: (UAMSettings.() -> Unit)? = null) {
         val formParams = attributes.formParams
 
         //Build the new url
-        val urlToConnect = String.format(urlTemplate, scheme, host)
+        val urlToConnect = String.format(urlTemplate, scheme, host) + formParams.action.first + formParams.action.second
         val httpUrl = urlToConnect.toHttpUrl().newBuilder()
-            .addQueryParameter(formParams.action.first, formParams.action.second)
+            .addQueryParameter(formParams.action.first.substringAfter("?"), formParams.action.second)
             .addQueryParameter("jschl_vc", formParams.jschlVc)
             .addQueryParameter("pass", formParams.pass)
             .addQueryParameter("jschl_answer", formParams.jschlAnswer)
@@ -199,7 +208,7 @@ class CloudflareHTTPClient(uamSettingsBlock: (UAMSettings.() -> Unit)? = null) {
 
         //This should return the real website with cf_clearance cookie
         //used to automatically skip the countdown the next times
-        return client.newCall(request).await()
+        return okHttpClient.newCall(request).await()
     }
 
 

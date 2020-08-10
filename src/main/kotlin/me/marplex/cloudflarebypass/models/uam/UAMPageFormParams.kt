@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package it.marplex.cloudflarebypass.models.uam
+package me.marplex.cloudflarebypass.models.uam
 
-import it.marplex.cloudflarebypass.util.JavascriptEvaluator
-import org.mozilla.javascript.Context;
+import me.marplex.cloudflarebypass.util.JavascriptEvaluator
 
 /**
  * Holds the params used to perform the final POST request.
@@ -43,16 +42,28 @@ data class UAMPageFormParams(val r: String, val jschlVc: String, val pass: Strin
 
             //Parse every already set values
             val r = Regex("name=\"r\" value=\"([^\"]*)\"").find(page)!!.groupValues[1]
-            val jschlVc = Regex("name=\"jschl_vc\" value=\"([^\"]*)\"").find(page)!!.groupValues[1]
-            val pass = Regex("name=\"pass\" value=\"([^\"]*)\"").find(page)!!.groupValues[1]
-            val action = """action="\/\?([^"]+)"""".toRegex().find(page)!!.groupValues[1].split("=").let {
-                Pair(it[0], it[1])
+            val jschlVc = Regex("(?:name=\"jschl_vc\" value=\"([^\"]*)\"|value=\"([^\"]*)\".+?name=\"jschl_vc\")").find(page)!!.let {
+                if(it.groupValues[1].isEmpty()) it.groupValues[2]
+                else it.groupValues[1]
             }
 
-            //Solve the challenge to find the last form param
-            val jschlAnswer = getJschlAnswerFromPage(pageAttributes)
+            val pass = Regex("name=\"pass\" value=\"([^\"]*)\"").find(page)!!.groupValues[1]
+            val action = """action="([^"]+)"""".toRegex().find(page)!!.groupValues[1]
+                .split("=").let { Pair(it[0], it[1]) }
 
-            return UAMPageFormParams(r, jschlVc, pass, jschlAnswer, action)
+            //Solve the challenge to find the last form param
+            val jschlAnswer =
+                getJschlAnswerFromPage(
+                    pageAttributes
+                )
+
+            return UAMPageFormParams(
+                r,
+                jschlVc,
+                pass,
+                jschlAnswer,
+                action
+            )
         }
 
         /**
@@ -64,6 +75,9 @@ data class UAMPageFormParams(val r: String, val jschlVc: String, val pass: Strin
         private fun getJschlAnswerFromPage(pageAttributes: UAMPageAtributes): String {
             //Select the script tag content
             val scriptText = """<script .+?>([^€]+?)<\/script>""".toRegex().find(pageAttributes.page)!!.groupValues[1]
+
+
+            println(scriptText)
 
             //Select the important script text
             var importantScriptText = """setTimeout\(function\(\)\{([^€]+?toFixed\([0-9][0-9]\))""".toRegex().find(scriptText)!!.groupValues[1]
@@ -81,16 +95,19 @@ data class UAMPageFormParams(val r: String, val jschlVc: String, val pass: Strin
             //Add fake 'a' element
             importantScriptText = "var a = {value: 0.0};\n$importantScriptText"
 
-            //Create a fake 'document' object to return the correct value for 'k'
-            val correctValue = """id="cf-dn.+?>(.+?)<\/div>""".toRegex().find(pageAttributes.page)!!.groupValues[1]
-            val documentObject = "var document={getElementById:(i)=>{return{innerHTML:`$correctValue`}}};"
-            importantScriptText = documentObject + importantScriptText
+            //Create a fake 'document' object to return the correct value for 'k' if exists
+            val correctValue = """id="cf-dn.+?>(.+?)<\/div>""".toRegex().find(pageAttributes.page)?.groupValues?.get(1)
+            if(correctValue != null) {
+                val documentObject = "var document={getElementById:(i)=>{return{innerHTML:`$correctValue`}}};"
+                importantScriptText = documentObject + importantScriptText
+            }
+
 
             //Print the result in script
             importantScriptText += ";\na.value;"
 
             //Evaluate and return
-            val javascriptEvaluator = JavascriptEvaluator()
+            val javascriptEvaluator = JavascriptEvaluator.get()
             return javascriptEvaluator.evaluateString(importantScriptText)
         }
 

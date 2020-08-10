@@ -1,5 +1,6 @@
-import it.marplex.cloudflarebypass.CloudflareHTTPClient
+import me.marplex.cloudflarebypass.CloudflareHTTPClient
 import kotlinx.coroutines.runBlocking
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -10,13 +11,15 @@ class CloudflareBypassTest {
 
     @Test
     fun shouldReturnResponseWithouthBypassing() = runBlocking {
-        val response = client.get("https://www.example.com")
+        val url = "https://www.example.com".toHttpUrlOrNull()!!
+        val response = client.get(url)
         assertTrue(response.code == 200)
     }
 
     @Test
     fun shouldReturnRealWebpage() = runBlocking {
-        val response = client.get("https://www.seriehd.moda")
+        val url = "https://www.seriehd.moda".toHttpUrlOrNull()!!
+        val response = client.get(url)
         val body = response.body!!.string()
         val bodyPart = body.substring(260, 281)
 

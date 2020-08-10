@@ -44,7 +44,8 @@ runBlocking {
     val client = CloudflareHTTPClient()
 
     //Returns an OkHttp Response object
-    val response = client.get("https://www.example.com")
+    val url = "https://www.example.com".toHttpUrlOrNull()!!
+    val response = client.get(url)
 }
 ```
 
@@ -55,7 +56,8 @@ runBlocking {
     val client = CloudflareHTTPClient()
 
     //Returns an OkHttp Response object
-    val response = client.get("https://www.example.com") {
+    val url = "https://www.example.com".toHttpUrlOrNull()!!
+    val response = client.get(url) {
         addHeader("X-Custom", "1")
     }
 }
@@ -72,7 +74,8 @@ runBlocking {
         .build()
 
     //Returns an OkHttp Response object
-    val response = client.post("https://www.example.com", formBody)
+    val url = "https://www.example.com".toHttpUrlOrNull()!!
+    val response = client.post(url, formBody)
 }
 ```
 
